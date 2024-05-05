@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Stack;
 
 public class Main {
     public static void main(String[] args) {
@@ -39,10 +40,14 @@ public class Main {
             System.out.println(Arrays.toString(words));
         }
         ArrayList<Integer> currentSolution = new ArrayList<>();
-        System.out.println(solveDomino(linesArray, currentSolution));
+        Stack<Boolean> isRightStack = new Stack<>();
+        System.out.println(solveDomino(linesArray, currentSolution, isRightStack, 1));
     }
 
-    public static String solveDomino(ArrayList<int[]> dominos, ArrayList<Integer> currentSolution) {
+    // ir emplilhando os lados que eu adicionei um domino, dai eu posso ir tirando
+    // recursivamente caso ja tenha andado por todos os dominos daquela etapa
+    public static String solveDomino(ArrayList<int[]> dominos, ArrayList<Integer> currentSolution,
+            Stack<Boolean> isRightStack, int howManyDominosToRemove) {
         if (dominos.size() == 0) {
             return currentSolution.toString();
         }
@@ -53,7 +58,8 @@ public class Main {
                 currentSolution.add(0, domino[0]);
                 currentSolution.add(1, domino[1]);
                 dominos.remove(i);
-                solveDomino(dominos, currentSolution);
+                isRightStack.add(true);
+                solveDomino(dominos, currentSolution, isRightStack, howManyDominosToRemove);
             } else {
                 int lastNumber = currentSolution.get(currentSolution.size() - 1);
                 int firstNumber = currentSolution.get(0);
@@ -61,24 +67,46 @@ public class Main {
                     currentSolution.add(0, domino[0]);
                     currentSolution.add(0, domino[1]);
                     dominos.remove(i);
-                    solveDomino(dominos, currentSolution);
+                    isRightStack.add(true);
+                    solveDomino(dominos, currentSolution, isRightStack, howManyDominosToRemove);
                 } else if (domino[1] == firstNumber) {
                     currentSolution.add(0, domino[1]);
                     currentSolution.add(0, domino[0]);
                     dominos.remove(i);
-                    solveDomino(dominos, currentSolution);
+                    isRightStack.add(true);
+                    solveDomino(dominos, currentSolution, isRightStack, howManyDominosToRemove);
                 } else if (domino[0] == lastNumber) {
                     currentSolution.add(currentSolution.size(), domino[0]);
                     currentSolution.add(currentSolution.size(), domino[1]);
                     dominos.remove(i);
-                    solveDomino(dominos, currentSolution);
+                    isRightStack.add(false);
+                    solveDomino(dominos, currentSolution, isRightStack, howManyDominosToRemove);
                 } else if (domino[1] == lastNumber) {
                     currentSolution.add(currentSolution.size(), domino[1]);
                     currentSolution.add(currentSolution.size(), domino[0]);
                     dominos.remove(i);
-                    solveDomino(dominos, currentSolution);
+                    isRightStack.add(false);
+                    solveDomino(dominos, currentSolution, isRightStack, howManyDominosToRemove);
                 }
             }
+        }
+
+        if (dominos.size() != 0) {
+            for (int i = 0; i < howManyDominosToRemove; i++) {
+                int[] removedDomino = new int[2];
+                if (isRightStack.pop()) {
+                    removedDomino[0] = currentSolution.remove(0);
+                    removedDomino[1] = currentSolution.remove(0);
+                } else {
+                    removedDomino[0] = currentSolution.remove(currentSolution.size() - 1);
+                    removedDomino[1] = currentSolution.remove(currentSolution.size() - 1);
+                }
+                dominos.add(removedDomino);
+            }
+            if (howManyDominosToRemove > dominos.size()) {
+                return "Não foi possível resolver o problema";
+            }
+            solveDomino(dominos, currentSolution, isRightStack, howManyDominosToRemove);
         }
 
         return currentSolution.toString();
