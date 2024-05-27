@@ -7,6 +7,6 @@ public class Domino {
     }
 
     public String toString() {
-        return "(" + left + ", " + right + ")";
+        return "{" + left + " - " + right + "}";
     }
 }

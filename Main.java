@@ -1,11 +1,10 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
-public class Test {
-    public static boolean backtrack(List<Domino> dominoes, List<Domino> chain, boolean[] used) {
+public class Main {
+    public static boolean backtrack(ArrayList<Domino> dominoes, ArrayList<Domino> chain, boolean[] used) {
         if (chain.size() == dominoes.size()) {
             System.out.println(chain);
             return true;
@@ -35,21 +34,22 @@ public class Test {
 
     public static void main(String[] args) {
         try {
-            File file = new File("caso24.txt");
+            File file = new File(args[0]);
             Scanner scanner = new Scanner(file);
-            int n = scanner.nextInt();
-            List<Domino> dominoes = new ArrayList<>();
-            for (int i = 0; i < n; i++) {
+            int numberOfDominos = scanner.nextInt();
+            ArrayList<Domino> dominos = new ArrayList<>();
+            for (int i = 0; i < numberOfDominos; i++) {
                 int left = scanner.nextInt();
                 int right = scanner.nextInt();
-                dominoes.add(new Domino(left, right));
+                dominos.add(new Domino(left, right));
             }
-            boolean[] used = new boolean[n];
-            if (!backtrack(dominoes, new ArrayList<>(), used)) {
-                System.out.println("No solution");
+            boolean[] used = new boolean[numberOfDominos];
+            ArrayList<Domino> chain = new ArrayList<>();
+            if (!backtrack(dominos, chain, used)) {
+                System.out.println("Sem solução");
             }
         } catch (FileNotFoundException e) {
-            System.out.println("File not found");
+            System.out.println("Arquivo não encontrado");
         }
     }
 }
